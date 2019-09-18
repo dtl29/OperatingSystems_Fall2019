@@ -19,20 +19,22 @@
 /*                                                                        */
 /*                                                                        */
 /*                                                                        */
-/* Signed:     Daniel Louis        Date:    09/11/2019        */
+/* Signed:     Daniel Louis        Date:    09/18/2019        */
 /*                                                                        */
 /*                                                                        */
 /* 3460:4/526 BlackDOS2020 kernel, Version 1.03, Fall 2019.               */
 
 void handleInterrupt21(int,int,int,int);
 void printLogo();
-char* readString(char ar[]);
+void readString(char ar[80]);
 void testReadString();
+void writeInt(int n);
+void readInt(int * n);
+int div(int a, int b);
+int mod(int a, int b);
 
 void main()
-{
-   char* ar;
-
+{		
    makeInterrupt21();
    printLogo();
    interrupt(33,0,"Hello world from Dan Louis.\r\n\0",1,0);
@@ -43,17 +45,21 @@ void main()
 void printString(char* c, int d)
 {
    int count = 0;
+   char al;
+   char ah;
+   int ax;
+
    while(*(c +count) != '\0' && d == 0)
    {
-      char al = *(c+count);
-      char ah = 14;
-      int ax = ah * 256 + al;
+      al = *(c+count);
+      ah = 14;
+      ax = ah * 256 + al;
       interrupt(16,ax,0,0,0);
       count++;
    }
    while(*(c +count) != '\0' && d == 1)
    {
-      char al = *(c+count);
+      al = *(c+count);
       interrupt(23,al,0,0,0);
       count++;
    }
@@ -70,33 +76,131 @@ void printLogo()
    interrupt(33,0,"   //   \\\\        | |_) | | (_| | (__|   <| |__| | |__| |____) |\r\n\0",0,0);
    interrupt(33,0,"._/'     `\\.      |____/|_|\\__,_|\\___|_|\\_\\_____/ \\____/|_____/\r\n\0",0,0);
    interrupt(33,0," BlackDOS2020 v. 1.03, c. 2019. Based on a project by M. Black. \r\n\0",0,0);
-   interrupt(33,0," Author(s):Dan Louis, (s) .\r\n\r\n\0",0); 
+   interrupt(33,0," Author(s):Dan Louis,  \r\n\r\n\0",0); 
 }
 
 /* MAKE FUTURE UPDATES HERE */
 /* VVVVVVVVVVVVVVVVVVVVVVVV */
 
-char* readString(char ar[80])
+
+void readString(char ar[80])
 {
 	int counter = 0;
-	char c;
-	while(counter < 79 &&  ar[counter+1] != 0xD)
+	
+	do
 	{
-		ar[counter] = interrupt(22,0,0,0);
-		c = (char) ar[counter];
-		interrupt(33,0, c,0,0);
+		ar[counter] = interrupt(22,0,0,0,0);
+    		 interrupt(16,14 * 256 + ar[counter],0,0,0);
 		counter = counter + 1;
+		if(ar[counter-1] == 0x8 && counter > 1)
+		{
+			counter = counter - 2;
+		}
+	}while(counter < 80 &&  ar[counter -1] != 0xD);
+	ar[counter-1] = 0x0;
+	return;
+}
+
+void readInt(int **n)
+{
+	char ar[80];
+	int i = 0;
+ 	int len = 0 ;
+	int isNegative = 0;
+	int num = 0;
+	
+	readString(ar);
+	while(ar[len] != 0x0)
+	{
+		len += 1;
 	}
-	ar[counter] = 0x0;
-	return ar;
+	if(ar[0] == '-')
+	{
+		isNegative = 1;
+		i = 1;
+	}	
+	while(i < len)
+	{
+		num *= 10;
+		num += (ar[i++] - '0');
+	}
+	if(isNegative == 1)
+	{
+		num *= -1;
+	}
+	*n = num;
+	/*needs to return the int!!!!!      (num is right and so is readString and writeInt!!!!!) */
+	interrupt(33,0,"the num was : \n\r\0",0,0);
+	writeInt(num);
+	interrupt(33,0,"\n\r\0",0,0);
+}
+
+void writeInt(int n)
+{
+	char ar[80];
+	int i = 0;
+	int temp;
+	int counter = 0;
+	int len = 0;
+	int placeDiv = 10000;
+
+	if(n < 0)
+	{
+		i += 1;
+		ar[0] = '-';
+		n *= -1;
+	}
+	while (counter < 5)
+	{
+		temp = div(n,placeDiv);
+		if(temp != 0)
+		{
+			ar[i++] = temp + '0';
+			n -= temp * placeDiv;
+		}
+		placeDiv = div(placeDiv,10);
+		counter++;
+	}
+	ar[i] = 0x0;
+	interrupt(33,0,ar,0,0);
+}
+
+int mod(int a, int b)
+{
+	int x = a;
+	while (x >= b)
+		x = x -b;
+	return x;
+}
+
+int div(int a, int b)
+{
+	int q = 0; 
+	while(q * b <= a)
+		 q++;
+	return (q-1);
 }
 
 void testReadString()
 {
-	char* ar;
-	interrupt(33,0,"Please enter a string to print out. when done press enter",0,0);
-	ar = readString(ar);
-	interrupt(33,0,ar,1,0);
+	char ar[80];
+	int *n;
+	int m = -235;
+
+	interrupt(33,0,"Please enter a string to print out. when done press enter: \0",0,0);
+	 readString(ar);
+	interrupt(33,0,"\r\nthe entered value was: \r\n\0",0,0);
+	interrupt(33,0,ar,0,0);
+	interrupt(33,0," \r\n\0",0,0);
+	
+				interrupt(33,0,"the n was: \r\n\0",0,0);
+			writeInt(*n);
+			interrupt(33,0," \r\n\0",0,0);
+
+	interrupt(33, 0 ,"\r\nPlease enter a integer.\r\n\0", 0,0);
+	readInt(&n);
+	interrupt(33, 0 ,"\r\nThe input was: \r\n\0", 0,0);
+	writeInt(*n);
 }
 
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
