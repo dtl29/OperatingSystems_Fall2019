@@ -98,10 +98,11 @@ void readString(char ar[80])
 		}
 	}while(counter < 80 &&  ar[counter -1] != 0xD);
 	ar[counter-1] = 0x0;
+	interrupt(33,0,"\n\r\0",0,0);
 	return;
 }
 
-void readInt(int **n)
+void readInt(int *n)
 {
 	char ar[80];
 	int i = 0;
@@ -129,10 +130,6 @@ void readInt(int **n)
 		num *= -1;
 	}
 	*n = num;
-	/*needs to return the int!!!!!      (num is right and so is readString and writeInt!!!!!) */
-	interrupt(33,0,"the num was : \n\r\0",0,0);
-	writeInt(num);
-	interrupt(33,0,"\n\r\0",0,0);
 }
 
 void writeInt(int n)
@@ -141,7 +138,7 @@ void writeInt(int n)
 	int i = 0;
 	int temp;
 	int counter = 0;
-	int len = 0;
+	int bool  = 0;
 	int placeDiv = 10000;
 
 	if(n < 0)
@@ -153,16 +150,23 @@ void writeInt(int n)
 	while (counter < 5)
 	{
 		temp = div(n,placeDiv);
-		if(temp != 0)
+		if(bool == 1)
 		{
 			ar[i++] = temp + '0';
 			n -= temp * placeDiv;
+		}
+		if(temp != 0 && bool == 0)
+		{
+			ar[i++] = temp + '0';
+			n -= temp * placeDiv;
+			bool = 1;
 		}
 		placeDiv = div(placeDiv,10);
 		counter++;
 	}
 	ar[i] = 0x0;
 	interrupt(33,0,ar,0,0);
+	interrupt(33, 0 ,"\r\n\0", 0,0);
 }
 
 int mod(int a, int b)
@@ -184,22 +188,18 @@ int div(int a, int b)
 void testReadString()
 {
 	char ar[80];
-	int *n;
-	int m = -235;
+	int *n = 0;
+	int m = -200;
 
 	interrupt(33,0,"Please enter a string to print out. when done press enter: \0",0,0);
 	 readString(ar);
-	interrupt(33,0,"\r\nthe entered value was: \r\n\0",0,0);
+	interrupt(33,0,"the entered value was: \r\n\0",0,0);
 	interrupt(33,0,ar,0,0);
 	interrupt(33,0," \r\n\0",0,0);
-	
-				interrupt(33,0,"the n was: \r\n\0",0,0);
-			writeInt(*n);
-			interrupt(33,0," \r\n\0",0,0);
 
-	interrupt(33, 0 ,"\r\nPlease enter a integer.\r\n\0", 0,0);
-	readInt(&n);
-	interrupt(33, 0 ,"\r\nThe input was: \r\n\0", 0,0);
+	interrupt(33, 0 ,"Please enter a integer.\r\n\0", 0,0);
+	readInt(n);
+	interrupt(33, 0 ,"The input was: \r\n\0", 0,0);
 	writeInt(*n);
 }
 
@@ -212,9 +212,15 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
    switch(ax) {  
       case 0:  
             printString(bx,cx);
-/*      case 1: case 2: case 3: case 4: case 5: */
+      case 1:
+	    readString(bx); 
+/*case 2: case 3: case 4: case 5: */
 /*      case 6: case 7: case 8: case 9: case 10: */
-/*      case 11: case 12: case 13: case 14: case 15: */
+/*      case 11: case 12:*/
+      case 13:
+          writeInt(bx); 
+      case 14: 
+/*case 15: */
       default: printString("General BlackDOS error.\r\n\0"); 
    }  
 }
