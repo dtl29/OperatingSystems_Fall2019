@@ -1,12 +1,8 @@
 Daniel Louis
 Operation Sysytems Fall 2019 (8:45 section)
 
-Lab01
+Lab02
 
-For this lab I modified the preexisting c file inorder for the kernel to be able to display the black dos logo 
-and print "Hello world from Dan Louis" to the printer. I also made those calls to print be interrupt calls instead of 
-function calls within the c file. So now the kernel has the ability to call interrupt 33 inorder to parrellel print to both the 
-screen and the printer port. 
+For this lab I implemented a way to read input from the keyboard into the kernel through the interrupt 33. The first input will get a string that is at most 80 characters long and store it into a char array. The second input will capture an integer from the keyboard and store it in an int. Also wrote a function that can print an integer to the screen or to print. 
 
-In order to verify this please look at the c file named kernel.c  for the changes within the function printString and the handleInterrupt21 function. 
-Also within the printLogo function for the change of printString calls to interrupt calls. 
+To test this there is a madlib to fill out that will take the input from the keyboard and fill it in. The madlib will be printed out to printer.out.

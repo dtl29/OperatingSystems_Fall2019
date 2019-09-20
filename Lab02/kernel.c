@@ -26,22 +26,74 @@
 
 void handleInterrupt21(int,int,int,int);
 void printLogo();
-void readString(char ar[80]);
+/*void readString(char ar[80]);*/
 void testReadString();
-void writeInt(int n);
-void readInt(int * n);
+/*void writeInt(int n,int d);*/
+/*void readInt(int * n);*/
 int div(int a, int b);
 int mod(int a, int b);
 
 void main()
 {		
+   /*Test driver for the kernel*/
+   /*
    makeInterrupt21();
    printLogo();
    interrupt(33,0,"Hello world from Dan Louis.\r\n\0",1,0);
    testReadString();
    while(1);
+   */
+
+	﻿/* Mad Lib kernel.c - c. 2018 O'Neil */
+   char food[25], adjective[25], color[25], animal[25];
+   int temp;
+   makeInterrupt21();
+   printLogo();
+   interrupt(33,0,"\r\nWelcome to the Mad Libs kernel.\r\n\0",0,0);
+   interrupt(33,0,"Enter a food: \0",0,0);
+   interrupt(33,1,food,0,0);
+   temp = 0;
+   while ((temp < 100) || (temp > 120)) {
+      interrupt(33,0,"Enter a number between 100 and 120: \0",0,0);
+      interrupt(33,14,&temp,0,0); 
+   }
+   interrupt(33,0,"Enter an adjective: \0",0,0);
+   interrupt(33,1,adjective,0,0);
+   interrupt(33,0,"Enter a color: \0",0,0);
+   interrupt(33,1,color,0,0);
+   interrupt(33,0,"Enter an animal: \0",0,0);
+   interrupt(33,1,animal,0,0);
+   interrupt(33,0,"Your note is on the printer, go get it.\r\n\0",0,0);
+   interrupt(33,0,"Dear Professor O\'Neil,\r\n\0",1,0);
+   interrupt(33,0,"\r\nI am so sorry that I am unable to turn in my program at this time.\r\n\0",1,0);
+   interrupt(33,0,"First, I ate a rotten \0",1,0);
+   interrupt(33,0,food,1,0);
+   interrupt(33,0,", which made me turn \0",1,0);
+   interrupt(33,0,color,1,0);
+   interrupt(33,0," and extremely ill.\r\n\0",1,0);
+   interrupt(33,0,"I came down with a fever of \0",1,0);
+   interrupt(33,13,temp,1,0);
+   interrupt(33,0,". Next my \0",1,0);
+   interrupt(33,0,adjective,1,0);
+   interrupt(33,0," pet \0",1,0);
+   interrupt(33,0,animal,1,0);
+   interrupt(33,0," must have\r\nsmelled the remains of the \0",1,0);
+   interrupt(33,0,food,1,0);
+   interrupt(33,0," on my computer, because he ate it. I am\r\n\0",1,0);
+   interrupt(33,0,"currently rewriting the program and hope you will accept it late.\r\n\0",1,0);
+   interrupt(33,0,"\r\nSincerely,\r\n\0",1,0);
+   interrupt(33,0,"Daniel Louis\r\n\0",1,0);
+   while(1);
 }
 
+/*
+function printString : called with interrupt(33)
+*precondition: will take an argument of a char pointer that will be 
+**the begining of the string and an integer that will act as a boolean 
+**to set the destination of sceen if set to 0 or to print if set to 1.
+*postcondition: will print the input either to screen or to print depending
+**on the input value.
+*/
 void printString(char* c, int d)
 {
    int count = 0;
@@ -66,6 +118,10 @@ void printString(char* c, int d)
    return;
 }
 
+/*
+function printLogo
+*will print the black dos logo when called. 
+*/
 void printLogo()
 {
 
@@ -82,7 +138,12 @@ void printLogo()
 /* MAKE FUTURE UPDATES HERE */
 /* VVVVVVVVVVVVVVVVVVVVVVVV */
 
-
+/*
+function readString
+*Precondtion: This function will take a char array of 80 characters
+*Postcondition: The function will take input from the keyboard and 
+**store it into the char array. 
+*/
 void readString(char ar[80])
 {
 	int counter = 0;
@@ -102,6 +163,12 @@ void readString(char ar[80])
 	return;
 }
 
+/*
+function readInt
+*Precondition: this function takes an integer pointer as an argument
+*Postcondition: The function will read in an integer from the keyboard
+**and store it into the integer pointer that was passed through. 
+*/
 void readInt(int *n)
 {
 	char ar[80];
@@ -110,7 +177,7 @@ void readInt(int *n)
 	int isNegative = 0;
 	int num = 0;
 	
-	readString(ar);
+	interrupt(33,1,ar,0,0);
 	while(ar[len] != 0x0)
 	{
 		len += 1;
@@ -130,9 +197,19 @@ void readInt(int *n)
 		num *= -1;
 	}
 	*n = num;
+	return;
 }
 
-void writeInt(int n)
+/*
+function writeInt
+*Precondition: this function takes two arguments, first will be an 
+**integer that will be the number displayed on screen and the second 
+**will be the destination of where to print(0 for screen, 1 for printer)
+*Postcondition: this function will write the passed through integer to 
+**the screen if the second integer was 0 or to printer if the second 
+**integer was a 1
+*/
+void writeInt(int n, int d)
 {
 	char ar[80];
 	int i = 0;
@@ -165,10 +242,22 @@ void writeInt(int n)
 		counter++;
 	}
 	ar[i] = 0x0;
-	interrupt(33,0,ar,0,0);
-	interrupt(33, 0 ,"\r\n\0", 0,0);
+	if(d == 0)
+	{	
+		interrupt(33,0,ar,0,0);
+	}
+	else if(d == 1)
+	{
+		interrupt(33,0,ar,1,0);
+	}
 }
 
+/*
+function mod
+*Precondition: this function takes two integers as arguments
+*Postcondtion: This function will find the remainder between the 
+**two integers divided together. 
+*/
 int mod(int a, int b)
 {
 	int x = a;
@@ -177,6 +266,12 @@ int mod(int a, int b)
 	return x;
 }
 
+/*
+function div
+*Precondition: this function takes two integers as arguments
+*Postcondition: this function will find the quotient of the two
+**integers divided together. 
+*/
 int div(int a, int b)
 {
 	int q = 0; 
@@ -185,6 +280,10 @@ int div(int a, int b)
 	return (q-1);
 }
 
+/*
+function testReadString
+*this function will test the readString, readInt, and writeInt functions
+*/
 void testReadString()
 {
 	char ar[80];
@@ -192,15 +291,15 @@ void testReadString()
 	int m = -200;
 
 	interrupt(33,0,"Please enter a string to print out. when done press enter: \0",0,0);
-	 readString(ar);
+	interrupt(33,1,ar,0,0);
 	interrupt(33,0,"the entered value was: \r\n\0",0,0);
 	interrupt(33,0,ar,0,0);
 	interrupt(33,0," \r\n\0",0,0);
 
 	interrupt(33, 0 ,"Please enter a integer.\r\n\0", 0,0);
-	readInt(n);
-	interrupt(33, 0 ,"The input was: \r\n\0", 0,0);
-	writeInt(*n);
+	interrupt(33,14,n,0,0);
+	interrupt(33, 0 ,"The input was: \r\n\0", 1,0);
+	interrupt(33,13,*n,1,0);
 }
 
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
@@ -210,16 +309,29 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
    /*return;*/
    switch(ax) {  
-      case 0:  
-            printString(bx,cx);
+      case 0:
+      {  
+        printString(bx,cx);
+        break;
+      }
       case 1:
-	    readString(bx); 
+      {
+	    readString(bx);
+	    break; 
+	  }
 /*case 2: case 3: case 4: case 5: */
 /*      case 6: case 7: case 8: case 9: case 10: */
 /*      case 11: case 12:*/
       case 13:
-          writeInt(bx); 
-      case 14: 
+      {
+          writeInt(bx,cx);
+          break; 
+      }
+      case 14:
+      { 
+          readInt(bx);
+          break;
+      }
 /*case 15: */
       default: printString("General BlackDOS error.\r\n\0"); 
    }  
