@@ -28,7 +28,6 @@ void handleInterrupt21(int,int,int,int);
 void printLogo();
 /*void readString(char ar[80]);*/
 void testReadString();
-void testReadScrtors();
 /*void writeInt(int n,int d);*/
 /*void readInt(int * n);*/
 /*int div(int a, int b);*/
@@ -45,6 +44,29 @@ void main()
    while(1);
    */
 
+	/*lab03 test */
+	/*
+	char buffer[512];
+	makeInterrupt21();
+	printLogo();
+	interrupt(33,2,buffer,30,1);
+	interrupt(33,0,buffer,0,0);
+
+	interrupt(33,12,1,15,0);	
+	while(1);
+	*/
+
+	char buffer[512]; int i;
+	makeInterrupt21();
+	for(i=0;i<512;i++)buffer[i]=0;
+	buffer[0] = 1;
+	buffer[1] = 3;
+	interrupt(33,6,buffer,258,1);
+	interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
+	printLogo();
+	interrupt(33,2,buffer,30,1);
+	interrupt(33,0,buffer,0,0);
+	while(1);
 }
 
 /*
@@ -266,19 +288,75 @@ void testReadString()
 /*lab3 VVVV*/
 void readSectors(char *buffer, int sector, int sectorCount)
 {
+	int al;
+	int ah;
+	int ch;
+	int cl;
+	int dh;
+	int dl;
+	int ax;
+	int cx;
+	int dx;
+	char *bx = buffer;
 
-	//interrupt(19,);
+	ah = 2;
+	al = sectorCount;
+	ch = div(sector, 36);
+	cl = mod(sector, 18) + 1;
+	dh = mod(div(sector, 18), 2);
+	dl = 0;
+	ax = ah * 256 + al;
+	cx = ch * 256 + cl;
+	dx = dh * 256 + dl;
+
+	interrupt(19, ax, buffer, cx, dx);
+	return;
 }
 
-void testReadScrtors()
+void writeSectors(char *buffer, int sector, int sectorCount)
 {
-	char buffer[512];
-	makeInterrupt21();
-	printLogo();
-	interrupt(33,2,buffer,30,1);
-	interrupt(33,0,buffer,0,0);
-	while(1);
+	int al;
+	int ah;
+	int ch;
+	int cl;
+	int dh;
+	int dl;
+	int ax;
+	int cx;
+	int dx;
+	char *bx = buffer;
+
+	ah = 2;
+	al = sectorCount;
+	ch = div(sector, 36);
+	cl = mod(sector, 18) + 1;
+	dh = mod(div(sector, 18), 2);
+	dl = 0;
+	ax = ah * 384 + al;
+	cx = ch * 256 + cl;
+	dx = dh * 256 + dl;
+
+	interrupt(19, ax, buffer, cx, dx);
+	return;
 }
+
+void clearScreen(int bx, int cx)
+{
+	int i = 0;
+	while(i < 25)
+	{
+		interrupt(16,'\r',0,0,0);
+		interrupt(16,'\n',0,0,0);
+		i++;
+	}
+	interrupt(16,512,0,0,0);
+	if((bx > 0) && (cx > 0) && (bx <= 8) && (cx <= 16));
+	{
+		interrupt(16,1536,4096 * (bx - 1) + 256 * (cx - 1),0,6223);
+	}
+	return;
+}
+
 
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
 /* MAKE FUTURE UPDATES HERE */
@@ -294,18 +372,27 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
       }
       case 1:
       {
-	    	readString(bx);
-	    	break;
-	    }
-		  case 2:
-			{
-				void readSectors(bx, cx, dx);
-				break;
-			}
+	    readString(bx);
+	    break;
+	  }
+	  case 2:
+	  {
+		readSectors(bx, cx, dx);
+		break;
+	  }
 
 /*case 3: case 4: case 5: */
-/*      case 6: case 7: case 8: case 9: case 10: */
-/*      case 11: case 12:*/
+	  case 6:
+	  {
+	  	writeSectors(bx, cx, dx);
+	  	break;
+	  } 
+/*case 7: case 8: case 9: case 10: case 11: */
+	  case 12:
+	  {
+	  	clearScreen(bx, cx);
+	  	break;
+	  }
       case 13:
       {
           writeInt(bx,cx);
