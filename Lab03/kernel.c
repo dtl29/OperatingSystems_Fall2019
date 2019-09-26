@@ -26,43 +26,18 @@
 
 void handleInterrupt21(int,int,int,int);
 void printLogo();
-/*void readString(char ar[80]);*/
-void testReadString();
-/*void writeInt(int n,int d);*/
-/*void readInt(int * n);*/
-/*int div(int a, int b);*/
-/*int mod(int a, int b);*/
 
 void main()
 {
-   /*Test driver for the kernel*/
-   /*
-   makeInterrupt21();
-   printLogo();
-   interrupt(33,0,"Hello world from Dan Louis.\r\n\0",1,0);
-   testReadString();
-   while(1);
-   */
-
-	/*lab03 test */
-	/*
-	char buffer[512];
-	makeInterrupt21();
-	printLogo();
-	interrupt(33,2,buffer,30,1);
-	interrupt(33,0,buffer,0,0);
-
-	interrupt(33,12,1,15,0);	
-	while(1);
-	*/
 
 	char buffer[512]; int i;
 	makeInterrupt21();
-	for(i=0;i<512;i++)buffer[i]=0;
-	buffer[0] = 1;
-	buffer[1] = 3;
+	for(i=0;i<512;i++)
+		buffer[i] = 0;
+	buffer[0] = 5;
+	buffer[1] = 11;
 	interrupt(33,6,buffer,258,1);
-	interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
+  interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
 	printLogo();
 	interrupt(33,2,buffer,30,1);
 	interrupt(33,0,buffer,0,0);
@@ -115,7 +90,7 @@ void printLogo()
    interrupt(33,0,"   //   \\\\        | |_) | | (_| | (__|   <| |__| | |__| |____) |\r\n\0",0,0);
    interrupt(33,0,"._/'     `\\.      |____/|_|\\__,_|\\___|_|\\_\\_____/ \\____/|_____/\r\n\0",0,0);
    interrupt(33,0," BlackDOS2020 v. 1.03, c. 2019. Based on a project by M. Black. \r\n\0",0,0);
-   interrupt(33,0," Author(s):Dan Louis,  \r\n\r\n\0",0);
+   interrupt(33,0," Author(s):Dan Louis, Andrew Whelch \r\n\r\n\0",0);
 }
 
 /* MAKE FUTURE UPDATES HERE */
@@ -263,29 +238,9 @@ int div(int a, int b)
 	return (q-1);
 }
 
-/*
-function testReadString
-*this function will test the readString, readInt, and writeInt functions
-*/
-void testReadString()
-{
-	char ar[80];
-	int *n = 0;
-	int m = -200;
-
-	interrupt(33,0,"Please enter a string to print out. when done press enter: \0",0,0);
-	interrupt(33,1,ar,0,0);
-	interrupt(33,0,"the entered value was: \r\n\0",0,0);
-	interrupt(33,0,ar,0,0);
-	interrupt(33,0," \r\n\0",0,0);
-
-	interrupt(33, 0 ,"Please enter a integer.\r\n\0", 0,0);
-	interrupt(33,14,n,0,0);
-	interrupt(33, 0 ,"The input was: \r\n\0", 1,0);
-	interrupt(33,13,*n,1,0);
-}
 
 /*lab3 VVVV*/
+
 void readSectors(char *buffer, int sector, int sectorCount)
 {
 	int al;
@@ -339,20 +294,26 @@ void writeSectors(char *buffer, int sector, int sectorCount)
 	interrupt(19, ax, buffer, cx, dx);
 	return;
 }
-
+/*
+funciton clearScreen
+*precondition: this takes two integer arguments, the first will be the background color from the standard 16-bit text
+**palette and should be between 1 and 7. the next integer is the forground color form the same table and should be
+**between 1-15
+*postcondition: this will clear the screen and set the forground and background colors 
+*/
 void clearScreen(int bx, int cx)
 {
 	int i = 0;
-	while(i < 25)
+	while(i < 24)
 	{
-		interrupt(16,'\r',0,0,0);
-		interrupt(16,'\n',0,0,0);
+		interrupt(16,14*256+'\r',0,0,0);
+		interrupt(16,14*256+'\n',0,0,0);
 		i++;
 	}
 	interrupt(16,512,0,0,0);
-	if((bx > 0) && (cx > 0) && (bx <= 8) && (cx <= 16));
+	if((bx > 0) && (cx > 0) && (bx <= 8) && (cx <= 16))
 	{
-		interrupt(16,1536,4096 * (bx - 1) + 256 * (cx - 1),0,6223);
+		interrupt(16,1536,4096 * (bx - 1) + 256 * (cx - 1), 0, 6223);
 	}
 	return;
 }
@@ -386,24 +347,24 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
 	  {
 	  	writeSectors(bx, cx, dx);
 	  	break;
-	  } 
+	  }
 /*case 7: case 8: case 9: case 10: case 11: */
 	  case 12:
 	  {
 	  	clearScreen(bx, cx);
 	  	break;
 	  }
-      case 13:
-      {
-          writeInt(bx,cx);
-          break;
-      }
-      case 14:
-      {
-          readInt(bx);
-          break;
-      }
+    case 13:
+    {
+      writeInt(bx,cx);
+      break;
+    }
+    case 14:
+    {
+      readInt(bx);
+      break;
+    }
 /*case 15: */
-      default: printString("General BlackDOS error.\r\n\0");
+    default: printString("General BlackDOS error.\r\n\0");
    }
 }
