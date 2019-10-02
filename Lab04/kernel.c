@@ -32,10 +32,10 @@ void main()
 
 	char buffer[512];
 	makeInterrupt21();
-	interrupt(33,2,buffer,258,0);
-	interrupt(33,12,buffer[0]+1,buffer[1]+16,0);
+	interrupt(33,2,buffer,258,1);
+	interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
 	printLogo();
-	runProgram(30,4,2);
+	runProgram(30,1,2);
 	interrupt(33,5,0,0,0);
 	interrupt(33,0,"Error if this executes.\r\n\0",0,0);
 	while(1);
@@ -317,14 +317,14 @@ void clearScreen(int bx, int cx)
 
 void runProgram(int start, int size, int segment)
 {
-	char buffer[512];
+	char buffer[13312];
 	int i = 0;
 	int baseLocation = 0;
 
 	interrupt(33,2,buffer,start,size);
 	baseLocation = segment * 4096;
 
-	while(i < 512)
+	while(i < 13312)
 	{
 		putInMemory(baseLocation, i, buffer[i]);
 		i += 1;
