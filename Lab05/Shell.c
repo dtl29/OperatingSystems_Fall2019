@@ -1,9 +1,10 @@
-void inputValidation(char ar[512]);
+void inputValidation(char ar[512] , int *boolFail);
 
 void main()
 {
   char buffer[512];
   int i = 0;
+  int *boolFail;
 
   interrupt(33,2,buffer,258,1);
   interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
@@ -17,11 +18,17 @@ void main()
     i = 0;
     interrupt(33,0,"\n\r^(~(oo)~)^\0",0,0);
     interrupt(33,1,buffer,0,0);
-    inputValidation(buffer);
+    *boolFail = 0;
+    inputValidation(buffer, boolFail);
+    if(*boolFail == 1)
+    {
+      *boolFail = 0;
+      interrupt(33,0,"\n\rImproper command.\0",0,0);
+    }
   }
 }
 
-void inputValidation(char ar[512])
+void inputValidation(char ar[512], int *boolFail)
 {
   char arg1[507];
   char arg2[507];
@@ -70,109 +77,103 @@ void inputValidation(char ar[512])
   {
     if(arg1[0] == '\0' || arg2[0] == '\0')
     {
-      interrupt(33,0,"\ncopy need 2 arguments.\r\0",0,0);
+      *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\nCopy was read with the argument \0",0,0);
+    interrupt(33,0,"\n\rcopy was read with the argument \0",0,0);
     interrupt(33,0,arg1,0,0);
     interrupt(33,0," \0",0,0);
     interrupt(33,0,arg2,0,0);
-    interrupt(33,0,"\r\0",0,0);
     return;
   }
   else if(ar[0] == 'd' && ar[1] == 'd' && ar[2] == 'i' && ar[3] == 'r')
   {
     if(ar[5] != '\0')
     {
-      interrupt(33,0,"\nddir does not require an argument\r\0",0,0);
+      *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\nddir was read \r\0",0,0);
+    interrupt(33,0,"\n\rddir was read \r\0",0,0);
     return;
   }
   else if(ar[0] == 'e' && ar[1] == 'x' && ar[2] == 'e' && ar[3] == 'c')
   {
     if(arg1[0] == '\0')
     {
-      /*interrupt(33,0,"\nexec needs a file name with no white space.\r\0",0,0);*/
+      *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\nexec was read with the argument \0",0,0);
+    interrupt(33,0,"\n\rexec was read with the argument \0",0,0);
     interrupt(33,0,arg1,0,0);
-    interrupt(33,0,"\r\0",0,0);
     return;
   }
   else if(ar[0] == 'h' && ar[1] == 'e' && ar[2] == 'l' && ar[3] == 'p')
   {
     if(ar[5] != '\0')
     {
-      interrupt(33,0,"\nhelp does not require an argument\r\0",0,0);
+      *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\nhelp was read \r\0",0,0);
+    interrupt(33,0,"\n\rhelp was read \r\0",0,0);
     return;
   }
   else if(ar[0] == 'p' && ar[1] == 'r' && ar[2] == 'n' && ar[3] == 't')
   {
     if(arg1[0] == '\0')
     {
-      /*interrupt(33,0,"\nprnt needs a file name with no white space.\r\0",0,0);*/
+      *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\nprnt was read with the argument \0",0,0);
+    interrupt(33,0,"\n\rprnt was read with the argument \0",0,0);
     interrupt(33,0,arg1,0,0);
-    interrupt(33,0,"\r\0",0,0);
     return;
   }
   else if(ar[0] == 'r' && ar[1] == 'e' && ar[2] == 'm' && ar[3] == 'v')
   {
     if(arg1[0] == '\0')
     {
-      /*interrupt(33,0,"\nremv needs a file name with no white space.\r\0",0,0);*/
+      *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\nremv was read with the argument \0",0,0);
+    interrupt(33,0,"\n\rremv was read with the argument \0",0,0);
     interrupt(33,0,arg1,0,0);
-    interrupt(33,0,"\r\0",0,0);
     return;
   }
   else if(ar[0] == 's' && ar[1] == 'e' && ar[2] == 'n' && ar[3] == 'v')
   {
     if(ar[5] != '\0')
     {
-      /*interrupt(33,0,"\nsenv does not require an argument\r\0",0,0);*/
+      *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\nsenv was read \r\0",0,0);
+    interrupt(33,0,"\n\rsenv was read \r\0",0,0);
     return;
   }
   else if(ar[0] == 's' && ar[1] == 'h' && ar[2] == 'o' && ar[3] == 'w')
   {
     if(arg1[0] == '\0')
     {
-      /*interrupt(33,0,"\nshow needs a file name with no white space.\r\0",0,0);*/
+      *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\nshow was read with the argument \0",0,0);
+    interrupt(33,0,"\n\rshow was read with the argument \0",0,0);
     interrupt(33,0,arg1,0,0);
-    interrupt(33,0,"\r\0",0,0);
     return;
   }
   else if(ar[0] == 't' && ar[1] == 'w' && ar[2] == 'e' && ar[3] == 't')
   {
     if(arg1[0] == '\0')
     {
-      /*interrupt(33,0,"\ntwet needs a file name with no white space.\r\0",0,0);*/
+      *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\ntwet was read with the argument \0",0,0);
+    interrupt(33,0,"\n\rtwet was read with the argument \0",0,0);
     interrupt(33,0,arg1,0,0);
-    interrupt(33,0,"\r\0",0,0);
     return;
   }
   else
   {
-    interrupt(33,0,"\nnot a command.\r\0",0,0);
+    interrupt(33,0,"\n\rnot a command.\r\0",0,0);
     return;
   }
 }
