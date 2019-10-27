@@ -27,11 +27,11 @@
 void handleInterrupt21(int,int,int,int);
 void printLogo();
 void runProgram(int start, int size, int segment);
-int checkFileName(char* fname, char* checkName);
+
 void main()
 {
 
-	char buffer[512]; int size;
+  char buffer[512]; int size;
   makeInterrupt21();
   /* Step 0 – config file */
   interrupt(33,2,buffer,258,1);
@@ -345,42 +345,80 @@ void readFile(char* fname, char* buffer, int* size)
 	char diskDirectoryBuffer[512];
 	int foundBool = 0;
 	int i = 0;
-
-	if(sizeof(fname) < 8)
-	{
-		while(i < 8)
-		{
-			if(!fname[i])
-			{
-				fname[i] = 0;
-			}
-			i++;
-		}
-		i = 0;
-	}
+	int j = 0;
 
 	interrupt(33,2,diskDirectoryBuffer,257,1);
+
 	while(foundBool == 0 && i < 512)
 	{
-		checkFileName(fname, diskDirectoryBuffer[i]);
-		i = i + 8;
-	}
-	i = i - 8;
-	interrupt(33,2,buffer,i,size);
-
-}
-int checkFileName(char* fname, char* checkName)
-{
-	int i;
-	for(i = 0; i < 8; i++)
-	{
-		if(fname[i] != checkName[i])
+		foundBool = 1;
+		while(j < 8 && fname[j] != '\0')
 		{
-			return 0;
+			if(fname[j] != diskDirectoryBuffer[j+i])
+			{
+				foundBool = 2;
+			}
+			j++;
 		}
+		if(foundBool == 2)
+		{
+			i = i + 16;
+			foundBool = 0;
+		}
+		else
+		{
+			break;
+		}
+		j = 0;
 	}
-	return 1;
+	if(foundBool == 0)
+	{
+		interrupt(33,15,0,0,0);
+	}
+	else
+	{
+		interrupt(33,2,buffer,diskDirectoryBuffer[i+8],diskDirectoryBuffer[i+9]);
+		interrupt(33,0, buffer,0,0);
+	}
+	return;
 }
+void error(int bx)
+{
+   switch (bx) {
+	   case 0:
+	   /* error 0 = "File not found." */
+	   interrupt(16, 3654, 0, 0, 0); interrupt(16, 3689, 0, 0, 0); interrupt(16, 3692, 0, 0, 0);
+	   interrupt(16, 3685, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3694, 0, 0, 0);
+	   interrupt(16, 3695, 0, 0, 0); interrupt(16, 3700, 0, 0, 0); interrupt(16, 3616, 0, 0, 0);
+	   interrupt(16, 3686, 0, 0, 0); interrupt(16, 3695, 0, 0, 0); interrupt(16, 3701, 0, 0, 0);
+	   interrupt(16, 3694, 0, 0, 0); interrupt(16, 3684, 0, 0, 0);
+	   break;
+	   case 1:
+	   /* error 1 = "Bad file name." */
+	   interrupt(16, 3650, 0, 0, 0); interrupt(16, 3681, 0, 0, 0); interrupt(16, 3684, 0, 0, 0);
+	   interrupt(16, 3616, 0, 0, 0); interrupt(16, 3686, 0, 0, 0); interrupt(16, 3689, 0, 0, 0);
+	   interrupt(16, 3692, 0, 0, 0); interrupt(16, 3685, 0, 0, 0); interrupt(16, 3616, 0, 0, 0);
+	   interrupt(16, 3694, 0, 0, 0); interrupt(16, 3681, 0, 0, 0); interrupt(16, 3693, 0, 0, 0);
+	   interrupt(16, 3685, 0, 0, 0);
+	   break;
+	   case 2:
+	   /* error 2 = "Disk full." */
+	   interrupt(16, 3652, 0, 0, 0); interrupt(16, 3689, 0, 0, 0); interrupt(16, 3699, 0, 0, 0);
+	   interrupt(16, 3691, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3686, 0, 0, 0);
+	   interrupt(16, 3701, 0, 0, 0); interrupt(16, 3692, 0, 0, 0); interrupt(16, 3692, 0, 0, 0);
+	   break;
+	   default:
+	   /* default = "General error." */
+	   interrupt(16, 3655, 0, 0, 0); interrupt(16, 3685, 0, 0, 0); interrupt(16, 3694, 0, 0, 0);
+	   interrupt(16, 3685, 0, 0, 0); interrupt(16, 3698, 0, 0, 0); interrupt(16, 3681, 0, 0, 0);
+	   interrupt(16, 3692, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3685, 0, 0, 0);
+	   interrupt(16, 3698, 0, 0, 0); interrupt(16, 3698, 0, 0, 0); interrupt(16, 3695, 0, 0, 0);
+	   interrupt(16, 3698, 0, 0, 0);
+   }
+   interrupt(16, 3630, 0, 0, 0); interrupt(16, 3597, 0, 0, 0); interrupt(16, 3594, 0, 0, 0);
+   interrupt(33, 5, 0, 0, 0);
+}
+
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
 /* MAKE FUTURE UPDATES HERE */
 
@@ -434,7 +472,11 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
       readInt(bx);
       break;
     }
-		/*case 15: */
-    default: printString("General BlackDOS error.\r\n\0");
+	case 15: 
+	{
+		error(bx);
+		break;
+	}
+    default: error(3);
    }
 }

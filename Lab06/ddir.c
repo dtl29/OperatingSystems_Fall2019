@@ -17,7 +17,7 @@ void main()
 
    while(index < 32)
    {
-      if(directory[i] != 0x0 && index > 0)
+      if(directory[i] != 0x0 && index >= 0)
       {
          noChars = 0;
          for (j = 0; j < 8; j++)
