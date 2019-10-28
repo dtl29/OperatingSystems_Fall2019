@@ -26,7 +26,7 @@
 
 void handleInterrupt21(int,int,int,int);
 void printLogo();
-void runProgram(int start, int size, int segment);
+void runProgram(char* name, int segment);
 
 void main()
 {
@@ -40,6 +40,10 @@ void main()
   /* Step 1 – load and print msg file (Lab 3) */
   interrupt(33,3, "msg\0", buffer , &size);
   interrupt(33,0,buffer,0,0);
+
+  /*part 2*/
+  interrupt(33,4,"kitty2\0",2,0);
+  interrupt(33,0,"Error if this executes.\r\n\0",0,0);
   while (1);
 }
 
@@ -317,21 +321,21 @@ void clearScreen(int bx, int cx)
 	return;
 }
 
-void runProgram(int start, int size, int segment)
+void runProgram(char* name, int segment)
 {
 	char buffer[13312];
-	int i = 0;
+	int* i = &segment;
 	int baseLocation = 0;
 
-	interrupt(33,2,buffer,start,size);
-	baseLocation = segment * 4096;
+	interrupt(33,3,name,buffer,i);
+	/*baseLocation = segment * 4096;
 
 	while(i < 13312)
 	{
 		putInMemory(baseLocation, i, buffer[i]);
 		i += 1;
-	}
-	launchProgram(baseLocation);
+	}*/
+	launchProgram(buffer);
 }
 
 void stop()
@@ -378,7 +382,6 @@ void readFile(char* fname, char* buffer, int* size)
 	else
 	{
 		interrupt(33,2,buffer,diskDirectoryBuffer[i+8],diskDirectoryBuffer[i+9]);
-		interrupt(33,0, buffer,0,0);
 	}
 	return;
 }
@@ -445,7 +448,10 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
 		{
 			readFile(bx, cx, dx);
 		}
-		/* case 4: */
+		case 4:
+		{
+			runProgram(bx,cx);
+		}
 		case 5:
 		{
 			stop();
