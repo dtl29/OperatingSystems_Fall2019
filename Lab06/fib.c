@@ -3,6 +3,7 @@
 void main()
 {
    int i, a = 1, b = 1, c, n;
+   char buffer[512];
    PRINTS("How many terms? \0");
    SCANN(n);
    if (n < 3) n = 3;
@@ -21,5 +22,10 @@ void main()
       b = c;
    }
    PRINTS("\r\n\0");
+
+   interrupt(33,0,"\r\n\0",0,0);
+   interrupt(33,0,"\r\n\0",0,0);
+   interrupt(33,0,"      Press [ENTER] to continue.\r\n\0",0,0);
+   interrupt(33,1,buffer,0,0);
    END;
 }

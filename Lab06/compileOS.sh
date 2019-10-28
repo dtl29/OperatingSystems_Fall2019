@@ -22,3 +22,8 @@ bcc -ansi -c -o Manual.o Manual.c
 as86 blackdos.asm -o basm.o
 ld86 -o Manual -d Manual.o basm.o
 ./loadFile Manual
+
+bcc -ansi -c -o fib.o fib.c
+as86 blackdos.asm -o basm.o
+ld86 -o fib -d fib.o basm.o
+./loadFile fib
