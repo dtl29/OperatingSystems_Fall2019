@@ -32,6 +32,7 @@ void inputValidation(char ar[512], int *boolFail)
 {
   char arg1[507];
   char arg2[507];
+  char buffer[13312];
   int i = 0;
   int j = 5;
 
@@ -93,7 +94,8 @@ void inputValidation(char ar[512], int *boolFail)
       *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\n\rddir was read \r\0",0,0);
+    interrupt(33,0,"\n\r\0",0,0);
+    interrupt(33,4,"Ddir\0",4,0);
     return;
   }
   else if(ar[0] == 'e' && ar[1] == 'x' && ar[2] == 'e' && ar[3] == 'c')
@@ -103,8 +105,8 @@ void inputValidation(char ar[512], int *boolFail)
       *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\n\rexec was read with the argument \0",0,0);
-    interrupt(33,0,arg1,0,0);
+    interrupt(33,0,"\n\r\0",0,0);
+    interrupt(33,4,arg1,4,0);
     return;
   }
   else if(ar[0] == 'h' && ar[1] == 'e' && ar[2] == 'l' && ar[3] == 'p')
@@ -114,7 +116,8 @@ void inputValidation(char ar[512], int *boolFail)
       *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\n\rhelp was read \r\0",0,0);
+    interrupt(33,0,"\n\r\0",0,0);
+    interrupt(33,4,"Manual\0",4,0);
     return;
   }
   else if(ar[0] == 'p' && ar[1] == 'r' && ar[2] == 'n' && ar[3] == 't')
@@ -124,8 +127,9 @@ void inputValidation(char ar[512], int *boolFail)
       *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\n\rprnt was read with the argument \0",0,0);
-    interrupt(33,0,arg1,0,0);
+    interrupt(33,0,"\n\r\0",0,0);
+    interrupt(33,3,arg1,buffer,1);
+    interrupt(33,0,buffer,1,0);
     return;
   }
   else if(ar[0] == 'r' && ar[1] == 'e' && ar[2] == 'm' && ar[3] == 'v')
@@ -146,7 +150,8 @@ void inputValidation(char ar[512], int *boolFail)
       *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\n\rsenv was read \r\0",0,0);
+    interrupt(33,0,"\n\r\0",0,0);
+    interrupt(33,4,"Stenv\0",4,0);
     return;
   }
   else if(ar[0] == 's' && ar[1] == 'h' && ar[2] == 'o' && ar[3] == 'w')
@@ -156,8 +161,9 @@ void inputValidation(char ar[512], int *boolFail)
       *boolFail = 1;
       return;
     }
-    interrupt(33,0,"\n\rshow was read with the argument \0",0,0);
-    interrupt(33,0,arg1,0,0);
+    interrupt(33,0,"\n\r\0",0,0);
+    interrupt(33,3,arg1,buffer,1);
+    interrupt(33,0,buffer,0,0);
     return;
   }
   else if(ar[0] == 't' && ar[1] == 'w' && ar[2] == 'e' && ar[3] == 't')

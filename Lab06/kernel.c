@@ -38,12 +38,17 @@ void main()
   interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
   printLogo();
   /* Step 1 – load and print msg file (Lab 3) */
-  interrupt(33,3, "msg\0", buffer , &size);
-  interrupt(33,0,buffer,0,0);
+  /*interrupt(33,3, "msg\0", buffer , &size); */
+  /* interrupt(33,0,buffer,0,0); */
 
-  /*part 2*/
-  interrupt(33,4,"kitty2\0",2,0);
-  interrupt(33,0,"Error if this executes.\r\n\0",0,0);
+  /*Step 2 - Executing a Program*/
+  /*interrupt(33,4,"Stenv\0",2,0);*/
+  /*interrupt(33,0,"Error if this executes.\r\n\0",0,0);*/
+
+  /*Step 3 - Updating the Shell */
+  interrupt(33,4,"Shell\0",2,0);
+  interrupt(33,0,"Bad or missing command interpreter.\r\n\0",0,0);
+
   while (1);
 }
 
@@ -324,23 +329,23 @@ void clearScreen(int bx, int cx)
 void runProgram(char* name, int segment)
 {
 	char buffer[13312];
-	int* i = &segment;
+	int i = 0;
+  int * j = &segment;
 	int baseLocation = 0;
 
-	interrupt(33,3,name,buffer,i);
-	/*baseLocation = segment * 4096;
-
-	while(i < 13312)
-	{
-		putInMemory(baseLocation, i, buffer[i]);
-		i += 1;
-	}*/
-	launchProgram(buffer);
+	interrupt(33,3,name,buffer,j);
+  baseLocation = segment * 4096;
+  while(i < 13312)
+  {
+    putInMemory(baseLocation, i, buffer[i]);
+    i += 1;
+  }
+	launchProgram(baseLocation);
 }
 
 void stop()
 {
-	while(1);
+	launchProgram(8192);
 }
 
 void readFile(char* fname, char* buffer, int* size)
@@ -355,8 +360,7 @@ void readFile(char* fname, char* buffer, int* size)
 
 	while(foundBool == 0 && i < 512)
 	{
-		foundBool = 1;
-		while(j < 8 && fname[j] != '\0')
+		while(j < 8 && fname[j] != '\0' )
 		{
 			if(fname[j] != diskDirectoryBuffer[j+i])
 			{
@@ -366,25 +370,29 @@ void readFile(char* fname, char* buffer, int* size)
 		}
 		if(foundBool == 2)
 		{
-			i = i + 16;
+      i = i + 16;
 			foundBool = 0;
 		}
 		else
 		{
-			break;
+			foundBool = 1;
 		}
 		j = 0;
 	}
+
 	if(foundBool == 0)
 	{
 		interrupt(33,15,0,0,0);
+    return;
 	}
 	else
 	{
-		interrupt(33,2,buffer,diskDirectoryBuffer[i+8],diskDirectoryBuffer[i+9]);
+		interrupt(33,2,buffer,diskDirectoryBuffer[i+8],diskDirectoryBuffer[i+9]);\
+    return;
 	}
 	return;
 }
+
 void error(int bx)
 {
    switch (bx) {
@@ -447,10 +455,12 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
 		case 3:
 		{
 			readFile(bx, cx, dx);
+      break;
 		}
 		case 4:
 		{
 			runProgram(bx,cx);
+      break;
 		}
 		case 5:
 		{
@@ -462,7 +472,28 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
 	  	writeSectors(bx, cx, dx);
 	  	break;
 	  }
-/*case 7: case 8: case 9: case 10: case 11: */
+
+    case 7:
+    {
+      break;
+    }
+    case 8:
+    {
+      break;
+    }
+    case 9:
+    {
+      break;
+    }
+    case 10:
+    {
+      break;
+    }
+    case 11:
+    {
+      break;
+    }
+
 	  case 12:
 	  {
 	  	clearScreen(bx, cx);
@@ -478,11 +509,11 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
       readInt(bx);
       break;
     }
-	case 15: 
-	{
-		error(bx);
-		break;
-	}
+	  case 15:
+	  {
+		  error(bx);
+		  break;
+	  }
     default: error(3);
    }
 }

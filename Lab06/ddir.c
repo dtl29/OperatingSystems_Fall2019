@@ -59,6 +59,10 @@ void main()
 
    PRINTS("\r\n\r\n\0");
    PRINTS("     ----------------------\r\n\r\n\0");
+   interrupt(33,0,"\r\n\0",0,0);
+   interrupt(33,0,"\r\n\0",0,0);
+   interrupt(33,0,"      Press [ENTER] to continue.\r\n\0",0,0);
+   interrupt(33,1,filename,0,0);
    END;
 }
 
@@ -73,4 +77,3 @@ int is_capital(char* c)
       return 0;
    }
 }
-
