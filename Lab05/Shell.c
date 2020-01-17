@@ -27,7 +27,13 @@ void main()
     }
   }
 }
-
+/*
+Function inputValidation
+*precondition: takes 2 arguments
+**first is a char array that is what the input from the user was
+**second is an int pointer that will be returned stating if the input was valid or not
+*postcondition: will verify that the input from the user matches one that is a shell command
+*/
 void inputValidation(char ar[512], int *boolFail)
 {
   char arg1[507];
