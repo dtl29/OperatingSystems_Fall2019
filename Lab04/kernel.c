@@ -42,10 +42,10 @@ void main()
 }
 
 /*
-function printString : called with interrupt(33)
+Function printString : called with interrupt(33)
 *precondition: will take an argument of a char pointer that will be
-**the begining of the string and an integer that will act as a boolean
-**to set the destination of sceen if set to 0 or to print if set to 1.
+**the beginning of the string and an integer that will act as a boolean
+**to set the destination of screen if set to 0 or to print if set to 1.
 *postcondition: will print the input either to screen or to print depending
 **on the input value.
 */
@@ -74,8 +74,9 @@ void printString(char* c, int d)
 }
 
 /*
-function printLogo
-*will print the black dos logo when called.
+Function printLogo
+*precondition: takes no arguments
+*postcondition: will print the black dos logo when called.
 */
 void printLogo()
 {
@@ -94,8 +95,8 @@ void printLogo()
 /* VVVVVVVVVVVVVVVVVVVVVVVV */
 
 /*
-function readString
-*Precondtion: This function will take a char array of 80 characters
+Function readString
+*Precondition: This function will take a char array of 80 characters
 *Postcondition: The function will take input from the keyboard and
 **store it into the char array.
 */
@@ -119,7 +120,7 @@ void readString(char ar[80])
 }
 
 /*
-function readInt
+Function readInt
 *Precondition: this function takes an integer pointer as an argument
 *Postcondition: The function will read in an integer from the keyboard
 **and store it into the integer pointer that was passed through.
@@ -156,7 +157,7 @@ void readInt(int *n)
 }
 
 /*
-function writeInt
+Function writeInt
 *Precondition: this function takes two arguments, first will be an
 **integer that will be the number displayed on screen and the second
 **will be the destination of where to print(0 for screen, 1 for printer)
@@ -208,9 +209,9 @@ void writeInt(int n, int d)
 }
 
 /*
-function mod
+Function mod
 *Precondition: this function takes two integers as arguments
-*Postcondtion: This function will find the remainder between the
+*Postcondition: This function will find the remainder between the
 **two integers divided together.
 */
 int mod(int a, int b)
@@ -222,7 +223,7 @@ int mod(int a, int b)
 }
 
 /*
-function div
+Function div
 *Precondition: this function takes two integers as arguments
 *Postcondition: this function will find the quotient of the two
 **integers divided together.
@@ -238,6 +239,14 @@ int div(int a, int b)
 
 /*lab3 VVVV*/
 
+/*
+Function readSectors
+*precondition: will take 3 arguments 
+**first will be the pointer of a char array that will hold the returned file
+**second will be the sector at which should be read
+**third will be the amount of sectors that should be read
+*postcondition: will place the characters from the specified sectors 
+*/
 void readSectors(char *buffer, int sector, int sectorCount)
 {
 	int al;
@@ -265,6 +274,14 @@ void readSectors(char *buffer, int sector, int sectorCount)
 	return;
 }
 
+/*
+Function writeSectors
+*precondition: will take 3 arguments.
+**first will be the character strings as a pointer that should be written.
+**second will be the sector it should be placed into.
+**third will be how many sectors the string will take to write too.
+*postcondition: will write the string to the disk at the specified sector.
+*/
 void writeSectors(char *buffer, int sector, int sectorCount)
 {
 	int al;
@@ -291,12 +308,13 @@ void writeSectors(char *buffer, int sector, int sectorCount)
 	interrupt(19, ax, buffer, cx, dx);
 	return;
 }
+
 /*
-funciton clearScreen
+Function clearScreen
 *precondition: this takes two integer arguments, the first will be the background color from the standard 16-bit text
-**palette and should be between 1 and 7. the next integer is the forground color form the same table and should be
+**palette and should be between 1 and 7. the next integer is the foreground color form the same table and should be
 **between 1-15
-*postcondition: this will clear the screen and set the forground and background colors
+*postcondition: this will clear the screen and set the foreground and background colors
 */
 void clearScreen(int bx, int cx)
 {
@@ -315,6 +333,14 @@ void clearScreen(int bx, int cx)
 	return;
 }
 
+/*
+Function runProgram
+*precondition: takes two arguments
+**first pointer to a character string of the name of the program to run
+**second is the segment which is the starting location to the program table
+*postcondition: this will run the program at the sector specified when called.
+**will run it from the shell
+*/
 void runProgram(int start, int size, int segment)
 {
 	char buffer[13312];
@@ -332,6 +358,11 @@ void runProgram(int start, int size, int segment)
 	launchProgram(baseLocation);
 }
 
+/*
+Function stop
+*precondition: takes no arguments and will restart the shell.
+*postcondition: will run an infinite loop.
+*/
 void stop()
 {
 	while(1);
@@ -341,6 +372,12 @@ void stop()
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
 /* MAKE FUTURE UPDATES HERE */
 
+/*
+Function handleInterrupt21
+*precondition: this takes 4 arguments, one that will select what function to call and the others to
+**send necessary inputs to the functions
+*postcondition: from selected this handler will call the proper function from the kernel
+*/
 void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
    /*return;*/
