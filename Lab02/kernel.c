@@ -87,10 +87,10 @@ void main()
 }
 
 /*
-function printString : called with interrupt(33)
-*precondition: will take an argument of a char pointer that will be 
-**the begining of the string and an integer that will act as a boolean 
-**to set the destination of sceen if set to 0 or to print if set to 1.
+Function printString : called with interrupt(33)
+*precondition: will take an argument of a char pointer that will be
+**the beginning of the string and an integer that will act as a boolean
+**to set the destination of screen if set to 0 or to print if set to 1.
 *postcondition: will print the input either to screen or to print depending
 **on the input value.
 */
@@ -119,8 +119,9 @@ void printString(char* c, int d)
 }
 
 /*
-function printLogo
-*will print the black dos logo when called. 
+Function printLogo
+*precondition: takes no arguments
+*postcondition: will print the black dos logo when called.
 */
 void printLogo()
 {
@@ -139,10 +140,10 @@ void printLogo()
 /* VVVVVVVVVVVVVVVVVVVVVVVV */
 
 /*
-function readString
-*Precondtion: This function will take a char array of 80 characters
-*Postcondition: The function will take input from the keyboard and 
-**store it into the char array. 
+Function readString
+*Precondition: This function will take a char array of 80 characters
+*Postcondition: The function will take input from the keyboard and
+**store it into the char array.
 */
 void readString(char ar[80])
 {
@@ -164,10 +165,10 @@ void readString(char ar[80])
 }
 
 /*
-function readInt
+Function readInt
 *Precondition: this function takes an integer pointer as an argument
 *Postcondition: The function will read in an integer from the keyboard
-**and store it into the integer pointer that was passed through. 
+**and store it into the integer pointer that was passed through.
 */
 void readInt(int *n)
 {
@@ -201,12 +202,12 @@ void readInt(int *n)
 }
 
 /*
-function writeInt
-*Precondition: this function takes two arguments, first will be an 
-**integer that will be the number displayed on screen and the second 
+Function writeInt
+*Precondition: this function takes two arguments, first will be an
+**integer that will be the number displayed on screen and the second
 **will be the destination of where to print(0 for screen, 1 for printer)
-*Postcondition: this function will write the passed through integer to 
-**the screen if the second integer was 0 or to printer if the second 
+*Postcondition: this function will write the passed through integer to
+**the screen if the second integer was 0 or to printer if the second
 **integer was a 1
 */
 void writeInt(int n, int d)
@@ -253,10 +254,10 @@ void writeInt(int n, int d)
 }
 
 /*
-function mod
+Function mod
 *Precondition: this function takes two integers as arguments
-*Postcondtion: This function will find the remainder between the 
-**two integers divided together. 
+*Postcondition: This function will find the remainder between the
+**two integers divided together.
 */
 int mod(int a, int b)
 {
@@ -267,10 +268,10 @@ int mod(int a, int b)
 }
 
 /*
-function div
+Function div
 *Precondition: this function takes two integers as arguments
 *Postcondition: this function will find the quotient of the two
-**integers divided together. 
+**integers divided together.
 */
 int div(int a, int b)
 {
@@ -305,6 +306,12 @@ void testReadString()
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
 /* MAKE FUTURE UPDATES HERE */
 
+/*
+Function handleInterrupt21
+*precondition: this takes 4 arguments, one that will select what function to call and the others to
+**send necessary inputs to the functions
+*postcondition: from selected this handler will call the proper function from the kernel
+*/
 void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
    /*return;*/
