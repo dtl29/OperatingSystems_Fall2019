@@ -37,6 +37,14 @@ void main()
    while(1);
 }
 
+/*
+Function printString : called with interrupt(33)
+*precondition: will take an argument of a char pointer that will be
+**the beginning of the string and an integer that will act as a boolean
+**to set the destination of screen if set to 0 or to print if set to 1.
+*postcondition: will print the input either to screen or to print depending
+**on the input value.
+*/
 void printString(char* c, int d)
 {
    int count = 0;
@@ -57,6 +65,11 @@ void printString(char* c, int d)
    return;
 }
 
+/*
+Function printLogo
+*precondition: takes no arguments
+*postcondition: will print the black dos logo when called.
+*/
 void printLogo()
 {
    /*printString("       ___   `._   ____  _            _    _____   ____   _____ \r\n\0",0);*/
@@ -86,6 +99,12 @@ void printLogo()
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
 /* MAKE FUTURE UPDATES HERE */
 
+/*
+Function handleInterrupt21
+*precondition: this takes 4 arguments, one that will select what function to call and the others to
+**send necessary inputs to the functions
+*postcondition: from selected this handler will call the proper function from the kernel
+*/
 void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
    /*return;*/
